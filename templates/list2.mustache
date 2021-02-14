@@ -1,0 +1,126 @@
+<div id="tools" class="local_video_directory_tools">
+    <button id="datatable_ajax_reload" class="btn btn-default"> {{#str}}reload, local_video_directory{{/str}}</button>
+    <button id="datatable_ajax_clear_tags" class="btn btn-default"> {{#str}}show_all, local_video_directory{{/str}} </button>
+
+</div>
+
+<table id="video_table" class="local_video_directory_video-table display" cellspacing="0">
+    <thead>
+        <tr>
+        {{#liststrings}}
+            <th>{{.}}</th>
+        {{/liststrings}}
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+{{#js}}
+
+require.config({catchError:true});
+require(['jquery', 'jqueryui', 'datatables', 'core/ajax'], function($, jqueryui, datatables, ajax) {
+    $(document).ready(function() {
+        var table = $("#video_table").DataTable({
+            "processing": true,
+            "responsive" : true,
+            "stateSave" : true,
+            "serverSide": true,
+            "language": {
+                "url": M.cfg.wwwroot + "/local/video_directory/datatables/{{lang}}.json"
+            },
+            "ajax": {
+                method: "POST",
+                data : function ( d ) {
+                    return JSON.stringify({"0" : {"index":0,"methodname":"local_video_directory_videolist","args" : {"data": JSON.stringify(d)}}});
+                },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                "url": M.cfg.wwwroot + '/blocks/video/ajax/get_video_ajax.php',
+                "dataSrc": function (d) {
+                    {{! dd = d[0];
+                    var data = JSON.parse(d); }}
+                    var data = d;
+                    if (data.error) {
+                        location.reload();
+                        return;
+                    }
+                    if (typeof data[0] !== 'undefined') {
+                        d.recordsTotal = data[0].total;
+                        d.draw = 0;
+                        d.recordsFiltered = data[0].total;
+                    } else {
+                        d.recordsTotal = 0;
+                        d.draw = 0;
+                        d.recordsFiltered = 0;
+                    }
+                    return data;
+                }
+            },
+            "order": [[{{order}}, "desc"]],
+            "columns": [
+                {{#fields}}
+                {"data": "{{name}}"},
+                {{/fields}}
+            ],
+            initComplete: function(){
+                $('.showembed').click(function(e) {
+                    e.preventDefault();
+                    // Find index of line by video id.
+                    for (index = 0; index < table.columns().data()[2].length; ++index) {
+                        if (table.columns().data()[2][index] == $(this).data('id')) {
+                            var myindex = index;
+                        }
+                    }
+                    var qrimg = '<img src="' + M.cfg.wwwroot + '/local/video_directory/qr.php?id=' + $(this).data('id') + '">';
+                    $(".ui-dialog-content").dialog("close");
+                    $('<div id="messagemodal">' + table.columns().data()[8][myindex] + qrimg + '</div>').dialog({width: 650, height: 400});
+                })
+            }
+        });
+
+        var clickEmbed = function(){
+                $('.showembed').click(function(e) {
+                    e.preventDefault();
+                    // Find index of line by video id.
+                    for (index = 0; index < table.columns().data()[2].length; ++index) {
+                        if (table.columns().data()[2][index] == $(this).data('id')) {
+                            var myindex = index;
+                        }
+                    }
+                    var qrimg = '<img src="' + M.cfg.wwwroot + '/local/video_directory/qr.php?id=' + $(this).data('id') + '">';
+                    $(".ui-dialog-content").dialog("close");
+                    $('<div id="messagemodal">' + table.columns().data()[8][myindex] + qrimg + '</div>').dialog({width: 650, height: 400});
+                })
+            };
+
+        var myReload = function(){
+            table.ajax.reload(clickEmbed);
+        }
+
+        $('#datatable_ajax_reload').click(function() {
+            table.ajax.reload(clickEmbed);
+        });
+
+        $('#datatable_ajax_clear_tags').click(function() {
+            window.location = 'list.php';
+        });
+
+        $('#video_table').on('change', '.ajax_edit', function () {
+            var data = this.id.split('_');
+            var field = this.type == 'checkbox' ? 'private' : 'orig_filename';
+            var id = data.pop();
+            var status = this.type == 'checkbox' ? this.checked : null;
+            var value = this.type == 'checkbox' ? null : this.value;
+            var promises = ajax.call([
+                { methodname: 'local_video_directory_edit', args: { videoid: id, field: field, value: value, status: status } }
+            ]);
+        });
+
+        $('.play_video').click(function () {
+            $("#video_player").show();
+        });
+        // reload table every 60 seconds
+        setTimeout(myReload, 60000);
+    });
+});
+
+{{/js}}

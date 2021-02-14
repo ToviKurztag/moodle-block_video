@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/video/db" VERSION="20100924" COMMENT="XMLDB file for Moodle blocks/video"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_video_preferences" COMMENT="Keep the preferences of the user in the video block">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"  NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="id" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="userid" NEXT="videoid"/>
+        <FIELD NAME="videoid" TYPE="char" LENGTH="128" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="courseid" NEXT="name"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false"  PREVIOUS="videoid" NEXT="data"/>
+        <FIELD NAME="data" TYPE="text" LENGTH="256" NOTNULL="false" SEQUENCE="false"  PREVIOUS="name" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="data"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_video_bookmarks" COMMENT="Bookmarks of videos from bynat">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"  NEXT="userid"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="id" NEXT="videoid"/>
+        <FIELD NAME="video_id" TYPE="char" LENGTH="128" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="ownerid" NEXT="videoposition"/>
+        <FIELD NAME="videoposition" TYPE="float" NOTNULL="false" SEQUENCE="false"  PREVIOUS="videoid" NEXT="text"/>
+        <FIELD NAME="text" TYPE="char" LENGTH="256" NOTNULL="false" SEQUENCE="false"  PREVIOUS="videoposition" NEXT="permission"/>
+        <FIELD NAME="permission" TYPE="text" LENGTH="128" NOTNULL="false" SEQUENCE="false"  PREVIOUS="name" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="permission"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_video" COMMENT="Names of videos from bynat">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"  NEXT="videoid"/>
+        <FIELD NAME="videoid" TYPE="char" LENGTH="128" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="ownerid" NEXT="name"/>
+        <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" />
+        <FIELD NAME="usermodifiedid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="name" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="usermodifiedid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>

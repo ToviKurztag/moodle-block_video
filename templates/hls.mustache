@@ -1,0 +1,60 @@
+  <video
+    id="myPlayer"
+    class="video-js vjs-fluid"
+    controls
+    preload="auto"
+    width="640"
+    height="360"
+    data-setup='{ "playbackRates": [0.5, 1, 1.5, 2] }'
+    poster='{{wwwroot}}/local/video_directory/thumb.php?id={{videoid}}'
+    onContextMenu="return false;"
+  >
+    <source src="{{videostream}}" type="{{type}}"/>
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a
+      web browser that
+      <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a
+      >
+    </p>
+  </video>
+  <script src="https://vjs.zencdn.net/7.8.4/video.js"></script>
+  <script src="videojs-contrib-hls/videojs-contrib-hlsjs.min.js"></script>
+  <script src="videojs-seek-buttons/videojs-seek-buttons.min.js"></script>
+  <script src="videojs-contrib-quality-levels/videojs-contrib-quality-levels.min.js"></script>
+  <script src="videojs-hls-quality-selector/videojs-hls-quality-selector.min.js"></script>
+  <script src="videojs-resume/store.everything.min.js"></script>
+  <script src="videojs-resume/videojs-resume.min.js"></script>
+
+  <script>
+    var player = videojs('#myPlayer');
+
+
+    (function(window, videojs) {
+      var player = window.player = videojs('myPlayer');
+      var seekButtons = window.seekButtons = player.seekButtons({
+        forward: 10,
+        back: 10
+      });
+    }(window, window.videojs));
+
+    (function(window, videojs) {
+      var player = window.player = videojs('myPlayer');
+      player.hlsQualitySelector({
+          displayCurrentQuality: true,
+      });
+    }(window, window.videojs));
+
+/*    (function(window, videojs) {
+    var player = window.player = videojs('myPlayer');
+    player.Resume({
+      uuid: 'block_videodirectory_{{videoid}}',
+      playbackOffset: 5, // begin playing video this number of seconds before it otherwise would.
+      title: 'Continue from last playback',
+      resumeButtonText: 'Resume',
+      cancelButtonText: 'Cancel'
+     });
+   }(window, window.videojs));
+*/
+
+  </script>

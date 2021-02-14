@@ -1,0 +1,66 @@
+
+<h1>{{# str }} choosevideostitle, block_video {{/ str }}</h1>
+
+<div class="searcharea">
+    <span class="sorttitle"><b>{{# str }}sortby , block_video {{/ str }}</b></span>
+    <div class="searchtext">
+        <span class="searchtexttitle">{{# str }} searchtexttitle, block_video {{/ str }}</span>
+        <input type="text" id="searchtext"/>
+    </div>
+    <div class="searchstartdate">
+        <span class="searchstartdatetitle">{{# str }} searchstartdatetitle, block_video {{/ str }}</span>
+        <input type="text" class="datepicker" id="searchstartdate" placeholder="dd-mm-yy" />
+    </div>
+    <div class="searchenddate">
+        <span class="searchenddatetitle">{{# str }} searchenddatetitle, block_video {{/ str }}</span>
+        <input type="text"  class="datepicker" id="searchenddate" placeholder="dd-mm-yy" />
+      
+    </div>
+
+</div>
+
+<div class="tablechoose">
+    <table id="choosevideo_table" class="table" >
+        <thead>
+            <tr>
+            {{#liststrings}}
+                <th>{{.}}</th>
+            {{/liststrings}}
+            </tr>
+        </thead>
+        <tbody>
+            {{#videos}}
+                <tr class="rowtable" id="row_{{{id}}}">
+                    <td class="videoselected"><input type="checkbox" name="{{{id}}}"{{^canedit}} disabled {{/canedit}} {{#select}} checked {{/select}} /></td>
+                    <td class="imgurl">
+                        {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
+                        {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
+                    </td>
+                    <td class="id">{{{id}}}</td>
+                    <td class="name">{{{name}}}</td>
+                    <td class="length">{{{length}}}</td>
+                    <td class="owner">{{{ownername}}}</td>
+                    <td class="public">{{{public}}}</td>
+                    <td class="date" date="{{{dateday}}}">{{{date}}}</td>
+                </tr>
+            {{/videos}}
+        </tbody>
+    </table>
+    <input type="button" id="savechoosevideos" class="btn" value="{{# str }} save, block_video {{/ str }}"/>
+</div>
+{{#js}}
+
+
+require.config({catchError:true});
+require(['jquery', 'jqueryui', 'datatables', 'core/ajax'], function($, jqueryui, datatables, ajax) {
+ 
+$(document).ready(function() {
+
+$( function() {
+    $( "#datepicker" ).datepicker();
+  } );
+
+})
+})
+
+{{/js}}

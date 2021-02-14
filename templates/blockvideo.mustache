@@ -1,0 +1,165 @@
+
+   {{#showheader}}
+<div id="videoheader">
+    <div id="preference">
+        {{#showheader}}  <input type="text" class="inputsearch" name="inputsearch" placeholder="{{#str}} search, block_video {{/str}}"/>
+        <div class="nosearchresult">{{# str }} nosearchresult, block_video {{/ str }}</div>
+        {{/showheader}}
+        <button id="prefertable" title="{{#str}} table, block_video {{/str}}" class="btn-outline-secondary {{^showingpreferencelist}}active{{/showingpreferencelist}}" >
+            <i class="fa fa-th blockvideo_i" aria-hidden="true"></i>
+        </button>
+        <button id="preferlist" title="{{#str}} list, block_video {{/str}}" class="btn-outline-secondary {{#showingpreferencelist}}active{{/showingpreferencelist}}">
+            <i class="fa fa-list blockvideo_i" aria-hidden="true"></i>
+        </button>
+    </div>
+</div>
+ {{/showheader}}
+<div id="contentblockvideos">
+        <div class="showingpreferencelist {{^showingpreferencelist}} hidden {{/showingpreferencelist}}">
+            
+            {{#showvideos}}
+            <div id="videos">
+                <h5 class= "blockheaders">{{# str }} videostitle, block_video {{/ str }}</h5>
+                <div class="videos">
+
+                    <div class="blockvideo_headertable headertable row">
+                        <div class="colvideo col-4">{{# str }} video, block_video {{/ str }}</div>
+                        <div class="colsubject col-4">{{# str }} subject, block_video {{/ str }}</div>
+                        <div class="colstarttime col-4">{{# str }} starttime, block_video {{/ str }}</div>
+                    </div>
+                    
+                    <div class="bodytable">
+                        {{#videos}}
+                            <div class="row  {{#hidden}}hiddenfromstudents{{/hidden}}" rowvid="{{{id}}}">
+                                <div class="colvideo col-4">
+                                    <a  class="imgurl" href="{{{source}}}">
+                                        {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
+                                        {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
+                                    </a>
+                                </div>
+                                <div class="colsubject col-4">
+                                    
+                                    <a href="{{{source}}}" vidid="{{{id}}}" class="{{#hidden}} hiddenfromstudents {{/hidden}}" title="{{{name}}}">
+                                        <span>{{{name}}}</span>
+                                    </a>
+                                    {{#caneditnamevideo}}
+                                    <i vidid="{{{id}}}" show="list" class="fa fa-pencil editname blockvideo_i"></i> 
+                                    <form datavideo={{{id}}}  show="list" class="formeditname">
+                                        <input name="videoname" type="text" value="{{{name}}}"/>
+                                    </form>
+                                    {{/caneditnamevideo}}
+                                </div>
+                                
+                                <div class="colstarttime col-4">{{{date}}}
+                                {{#caneditnamevideo}}
+                                <i vidid="{{{id}}}" show="list" class="fa {{hiddenclass}} blockvideo_i videovisible"></i>                               
+                                {{/caneditnamevideo}}
+                                </div>
+                                
+                            </div>
+                        {{/videos}}
+                    </div>
+                </div>
+            </div>
+            {{/showvideos}}
+            {{#showzoomvideos}}
+            <div id="zoomvideos">
+                <h5 class= "blockheaders">{{# str }} zoomvideostitle, block_video {{/ str }}
+                    {{#canaddlocalvideos}}
+                        <a href="{{{wwwroot}}}/blocks/video/choosevideos.php?courseid={{{course}}}">
+                            <i class="fa fa-plus blockvideo_i" aria-hidden="true"></i>
+                        </a>
+                    {{/canaddlocalvideos}}
+                </h5>
+                
+                {{#haszoomvideos}}
+                <div class="videos">
+                    <div class="blockvideo_headertable headertable row">
+                        <div class="colvideo col-4">{{# str }} video, block_video {{/ str }}</div>
+                        <div class="colsubject col-4">{{# str }} subject, block_video {{/ str }}</div>
+                        <div class="colstarttime col-4">{{# str }} starttime, block_video {{/ str }}</div>
+                    </div>
+                    
+                    <div class="bodytable">
+                        {{#zoomvideos}}
+                            <div class="row"rowvid="{{{id}}}" >
+                                <div class="colvideo col-4">
+                                    <a class="imgurl" href="{{{source}}}">
+                                        {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
+                                        {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
+                                    </a>
+                                </div>
+                                <div class="colsubject col-4">
+                                    <a href="{{{source}}}" title="{{{name}}}"><span>{{{name}}}</span></a>
+                                </div>
+                                <div class="colstarttime col-4">{{{date}}}</div>
+                            </div>
+                        {{/zoomvideos}}
+                    </div>
+                </div>
+                 {{/haszoomvideos}}
+            </div>
+            {{/showzoomvideos}}
+        </div>
+    
+
+        </br><div class="showingpreferencetable  {{#showingpreferencelist}}hidden{{/showingpreferencelist}}">
+            {{#showvideos}}
+                <div id="videos">
+                    <h5 >{{# str }} videostitle, block_video {{/ str }}</h5>
+                    <div class="videos">
+                        <div id="arrowrightvideos" class="arrowright"><i class=" blockvideo_i fal fa-angle-double-{{#dirrtl}}left{{/dirrtl}}{{^dirrtl}}right{{/dirrtl}}"></i></div>
+                        {{#videos}}
+                            <div id="{{{id}}}" class="videotableitem {{#hidden}} hiddenfromstudents {{/hidden}}" rowvid="{{{id}}}" dissearch="true">
+                                <a class="imgurl" href="{{{source}}}">
+                                    {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
+                                    {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
+                                </a>
+                                <div class="videoname">
+                                    <div class="textname">
+                                        <a href="{{{source}}}" vidid="{{{id}}}" class="{{#hidden}} hiddenfromstudents {{/hidden}}" title="{{{name}}}"> 
+                                            <span>{{{name}}}</span>
+                                        </a>
+                                    </div>
+                                    {{#caneditnamevideo}}
+                                    <i vidid="{{{id}}}" show="table" class=" blockvideo_i fa fa-pencil editname"></i>
+                                    <i vidid="{{{id}}}" show="table" class="fa {{hiddenclass}} blockvideo_i videovisible"></i>
+                                    <form datavideo={{{id}}} show="table" class="formeditname">
+                                        <input name="videoname" type="text" value="{{{name}}}"/>
+                                    </form>
+                                    {{/caneditnamevideo}}</div>
+                                <div class="videodate">{{{date}}}</div>
+                            </div>
+                        {{/videos}}
+                        <div id="arrowleftvideos"><i class=" blockvideo_i fal fa-angle-double-{{#dirrtl}}right{{/dirrtl}}{{^dirrtl}}left{{/dirrtl}}"></i></div>
+                    </div>
+                </div>
+            {{/showvideos}}
+            {{#showzoomvideos}}
+                </br><div id="zoomvideos">
+                    <h5 >{{# str }} zoomvideostitle, block_video {{/ str }}
+                        {{#canaddlocalvideos}}
+                            <a href="{{{wwwroot}}}/blocks/video/choosevideos.php?courseid={{{course}}}">
+                                <i class=" blockvideo_i fa fa-plus" aria-hidden="true"></i>
+                            </a>
+                        {{/canaddlocalvideos}}
+                    </h5>
+                    <div class="videos">
+                        <div id="arrowrightzoomvideos" class="arrowright"><i class="blockvideo_i fal fa-angle-double-{{#dirrtl}}left{{/dirrtl}}{{^dirrtl}}right{{/dirrtl}}"></i></div>
+                        {{#zoomvideos}}
+                            <div id="{{{id}}}" class="videotableitem" dissearch="true">
+                                <a class="imgurl" href="{{{source}}}">
+                                    {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
+                                    {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
+
+                                </a>
+                                <div class="videoname"><a href="{{{source}}}" title="{{{name}}}">{{{name}}}</a></div>
+                                <div class="videodate">{{{date}}}</div>
+                            </div>
+                        {{/zoomvideos}}
+                        <div id="arrowleftzoomvideos"><i class="blockvideo_i fal fa-angle-double-{{#dirrtl}}right{{/dirrtl}}{{^dirrtl}}left{{/dirrtl}}"></i></div>
+                    </div>
+                </div>
+            {{/showzoomvideos}}
+        </div>
+</div>
