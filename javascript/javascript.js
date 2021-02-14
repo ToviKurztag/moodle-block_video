@@ -210,12 +210,28 @@ require(['jquery', 'core/config'], function($, CFG) {
     })
 
     $('input.inputsearch').keyup(function() {
+
+        var listvideos = [];
+        var types = ['videos', 'zoomvideos'];
+        $('.showingpreferencelist .bodytable .row').each(function() {
+        var item = [];
+        for (part in types) {
+            if ($(this).parents('#'+types[part]).length) {
+                item['type'] = types[part]; 
+            }
+        }
+        item['rowvid'] = $(this).attr('rowvid');
+        item['show'] = 'list';
+        item['name'] = $(this).find('.colsubject span').text();
+        listvideos.push(item);
+        
+    })
+
         $('.nosearchresult').css('display', 'none');
         shows = [];
         shows['videos'] = 0;
         shows['zoomvideos'] = 0;
         for (let i = 0; i < listvideos.length; i++) {
-
             if (listvideos[i]['name'].indexOf(this.value) == -1) {
                 $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'none');
                 $('.showingpreferencetable .videotableitem[id="'+listvideos[i]['rowvid'] +'"]').attr('dissearch', 'false').css('display', 'none');
