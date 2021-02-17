@@ -117,6 +117,7 @@ require(['jquery', 'core/config'], function($, CFG) {
         $(selector+' span').addClass('hidden');
         $(selector+' i').addClass('hidden');
         $(selector+' form').css('display', 'block');
+
     })
 
     $(".videovisible").click(function() { 
@@ -158,7 +159,6 @@ require(['jquery', 'core/config'], function($, CFG) {
         var url = M.cfg.wwwroot + '/blocks/video/ajax/changenamevideo.php';
         vidid = $(this).attr('datavideo');
         show =  $(this).attr('show');
-        
         selector = '.showingpreference'+show+' #videos [rowvid="'+id+'"]';
         subselector = '#videos [rowvid="'+id+'"]';
         
@@ -168,21 +168,11 @@ require(['jquery', 'core/config'], function($, CFG) {
             data: {'vidid' : vidid, 
                    'videoname' : text,
                    'course' : course},
-            success: function (response) {                
+            success: function (response) {    
                 $(selector+' span').removeClass('hidden').text(text);
                 $(selector+' i').removeClass('hidden');
                 $(selector+' form').css('display', 'none');
                 $(subselector + ' span').text(text);
-                urltovideo = $(selector + ' a.imgurl').attr('href');
-                
-                posname = urltovideo.search('videoname=');
-                starturl = urltovideo.substr(0, posname);
-                endurl = urltovideo.substr(posname);
-                endurl = endurl.substr(endurl.search('&'));
-                newurl = starturl.concat('videoname=', text, endurl);
-                $(subselector + ' a.imgurl').attr('href', newurl);
-                $(subselector + ' .colsubject a').attr('href', newurl);
-                $(subselector + ' .textname a').attr('href', newurl);
                 $(subselector + ' .textname a').attr('title', text);
                 $(subselector + ' .colsubject a').attr('title', text);
             }
@@ -208,7 +198,6 @@ require(['jquery', 'core/config'], function($, CFG) {
 
     $('input.inputsearch').keyup(function() {
 
-        /*
         var listvideos = [];
         var types = ['videos', 'zoomvideos'];
         $('.showingpreferencelist .bodytable .row').each(function() {
@@ -223,7 +212,6 @@ require(['jquery', 'core/config'], function($, CFG) {
         item['name'] = $(this).find('.colsubject span').text();
         listvideos.push(item);
         })
-        */
 
         $('.nosearchresult').css('display', 'none');
         shows = [];
@@ -234,7 +222,7 @@ require(['jquery', 'core/config'], function($, CFG) {
                 $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'none');
                 $('.showingpreferencetable .videotableitem[id="'+listvideos[i]['rowvid'] +'"]').attr('dissearch', 'false').css('display', 'none');
             } else {
-                $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'inline-block');
+                $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'flex');
                 $('.showingpreferencetable .videotableitem[id="'+listvideos[i]['rowvid'] +'"]').attr('dissearch', 'true').css('display', 'inline-block');
                 shows[listvideos[i]['type']]++;
             }
