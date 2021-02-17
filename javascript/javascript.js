@@ -33,26 +33,31 @@ require(['jquery', 'core/config'], function($, CFG) {
        
         $('#arrowrightvideos').click(function() {
             arrowright('videos');
+            exit();
         })
         $('#arrowrightzoomvideos').click(function() {
             arrowright('zoomvideos');
+            exit();
         }) 
         $('#arrowleftvideos').click(function() {
             arrowleft('videos');
+            exit();
         })
         $('#arrowleftzoomvideos').click(function() {
             arrowleft('zoomvideos');
+            exit();
+
         })   
     }
 
     updateshowingtable();
     var arrowright = function(type) {
-        
+
         end = areas[type]['show'].lastIndexOf(true);
         areas[type]['show'].fill(false);
         areas[type]['show'].fill(true, end+1, end+3);
         updateshowtable('.showingpreferencetable #' + type +' .videotableitem', areas[type]['show']);
-        if (end +3 >= areas[type]['show'].length) {
+        if (end + 3 >= areas[type]['show'].length) {
             $('#arrowright'+type).css('display', 'none');
         }
         if (areas[type]['show'][0] == false) {
@@ -60,7 +65,7 @@ require(['jquery', 'core/config'], function($, CFG) {
         }
     }
     var arrowleft = function(type) {
-        
+
         start = areas[type]['show'].indexOf(true);
         areas[type]['show'].fill(false);
         areas[type]['show'].fill(true, start-2, start);
@@ -84,7 +89,6 @@ require(['jquery', 'core/config'], function($, CFG) {
             data: {'prefer' : prefer, 
                    'course' : course},
             success: function (response) {
-                // console.log(response);
             }
         });
         
@@ -138,19 +142,12 @@ require(['jquery', 'core/config'], function($, CFG) {
                     $(selector+'').parent().parent().removeClass('hiddenfromstudents');
                     $('.textname a[vidid="'+vidid+'"]').removeClass('hiddenfromstudents');
                     $('.colsubject a[vidid="'+vidid+'"]').removeClass('hiddenfromstudents');
-
-                   // $(selector+' ~ .hiddenfromstudents').remove();
                 } else {
                     $(selector+'').removeClass('fa-eye');
                     $(selector+'').addClass('fa-eye-slash');
                     $(selector+'').parent().parent().addClass('hiddenfromstudents');
-                    //$('a + i.blockvideo_i.videovisible[vidid="'+vidid+'"]').addClass('hiddenfromstudents');
-                   // console.log($('a + i.blockvideo_i.videovisible[vidid="'+vidid+'"]'));
                     $('.textname a[vidid="'+vidid+'"]').addClass('hiddenfromstudents');
                     $('.colsubject a[vidid="'+vidid+'"]').addClass('hiddenfromstudents');
-
-                    
-                    //$(selector+'').after('<span class="hiddenfromstudents tag tag-info">מוסתר מסטודנטים</span>');
                 }
             }
         });
@@ -211,6 +208,7 @@ require(['jquery', 'core/config'], function($, CFG) {
 
     $('input.inputsearch').keyup(function() {
 
+        /*
         var listvideos = [];
         var types = ['videos', 'zoomvideos'];
         $('.showingpreferencelist .bodytable .row').each(function() {
@@ -224,8 +222,8 @@ require(['jquery', 'core/config'], function($, CFG) {
         item['show'] = 'list';
         item['name'] = $(this).find('.colsubject span').text();
         listvideos.push(item);
-        
-    })
+        })
+        */
 
         $('.nosearchresult').css('display', 'none');
         shows = [];
@@ -236,7 +234,7 @@ require(['jquery', 'core/config'], function($, CFG) {
                 $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'none');
                 $('.showingpreferencetable .videotableitem[id="'+listvideos[i]['rowvid'] +'"]').attr('dissearch', 'false').css('display', 'none');
             } else {
-                $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'flex');
+                $('.showingpreferencelist .bodytable .row[rowvid="'+listvideos[i]['rowvid'] +'"]').css('display', 'inline-block');
                 $('.showingpreferencetable .videotableitem[id="'+listvideos[i]['rowvid'] +'"]').attr('dissearch', 'true').css('display', 'inline-block');
                 shows[listvideos[i]['type']]++;
             }
