@@ -31,18 +31,18 @@ defined('MOODLE_INTERNAL') || die;
 require_once( __DIR__ . '/../../config.php');
 require_once($CFG->dirroot . '/local/video_directory/locallib.php');
 
-function video($id , $courseid) {
+function block_video($id , $courseid) {
     $output = "<div class='videostream'>";
     $config = get_config('videostream');
 
     if (($config->streaming == "symlink") || ($config->streaming == "php")) {
-        $output .= get_video_source_elements_videojs($config->streaming, $id, $courseid);
+        $output .= block_video_get_video_videojs($config->streaming, $id, $courseid);
 
     } else if ($config->streaming == "hls") {
         // Elements for video sources. (here we get the hls video).
-        $output .= get_video_source_elements_hls($id, $courseid);
+        $output .= block_video_get_video_hls($id, $courseid);
     }
-    $output .= get_bookmark_controls($id);
+    $output .= block_video_get_bookmark_controls($id);
     // Close video tag.
     $output .= html_writer::end_tag('video');
     // Close videostream div.
@@ -50,21 +50,21 @@ function video($id , $courseid) {
     return $output;
 }
 
-function get_video_source_elements_videojs($type, $id, $courseid) {
+function block_video_get_video_videojs($type, $id, $courseid) {
     global $CFG, $OUTPUT;
 
     $width = '800px';
     $height = '500px';
 
-    $videolink = block_videodirectory_createsymlink($id);
+    $videolink = block_video_createsymlink($id);
 
     $data = array('width' => $width, 'height' => $height, 'videostream' => $videolink, 'wwwroot' => $CFG->wwwroot, 'videoid' => $id, 'type' => 'video/mp4');
     $output = $OUTPUT->render_from_template("block_videodirectory/hls", $data);
-    $output .= video_events($id, $courseid);
+    $output .= block_video_events($id, $courseid);
     return $output;
 }
 
-function block_videodirectory_createHLS($videoid) {
+function block_video_createHLS($videoid) {
     global $DB;
 
     $config = get_config('videostream');
@@ -97,7 +97,7 @@ function block_videodirectory_createHLS($videoid) {
 
 
 
-function video_events($id, $courseid) {
+function block_video_events($id, $courseid) {
     global $CFG, $DB;
 
     $context = context_course::instance($courseid);
@@ -146,7 +146,7 @@ function is_teacher($user = '') {
     return false;
 }
 
-function get_bookmark_controls($videoid) {
+function block_video_get_bookmark_controls($videoid) {
     global $DB, $USER, $OUTPUT;
     $output = '';
     $isteacher = is_teacher();
@@ -164,20 +164,20 @@ function get_bookmark_controls($videoid) {
     return $output;
 }
 
-function get_video_source_elements_hls($id, $courseid) {
+function block_video_get_video_hls($id, $courseid) {
     global $CFG, $OUTPUT, $PAGE;
     $width = '800px';
     $height = '500px';
-    $hlsstream = block_videodirectory_createHLS($id);
+    $hlsstream = block_video_createHLS($id);
     $data = array('width' => $width, 'height' => $height, 'videostream' => $hlsstream, 'wwwroot' => $CFG->wwwroot, 'videoid' => $id, 'type' => 'application/x-mpegURL');
     $output = $OUTPUT->render_from_template("block_videodirectory/hls", $data);
-    $output .= video_events($id, $courseid);
+    $output .= block_video_events($id, $courseid);
     return $output;
 }
 
 
 
-function block_videodirectory_createsymlink($videoid) {
+function block_video_createsymlink($videoid) {
     global $DB;
     $filename = $DB->get_field('local_video_directory', 'filename', [ 'id' => $videoid ]);
     if (substr($filename, -4) != '.mp4') {
@@ -220,11 +220,14 @@ function get_videos_from_zoom($courseid = null) {
 
                         
         $videos = $DB->get_records_sql($sql, [$course->id]);
+
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-            unset($videos[$video->id]);
-            continue;
+          //Tovi
+            //  print_r($video->filename);die;
+           // unset($videos[$video->id]);
+            //continue;
         }
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         $video->imgurl = $streamingurl . $video->filename . '-mini.png';
@@ -232,7 +235,10 @@ function get_videos_from_zoom($courseid = null) {
             $video->imgurl = '';
         }
         $video->date = date('d-m-yy H:i:s', $video->timemodified);
+
     }
+   // print_r($videos);die;
+
     return array_values($videos);
 }
 
@@ -271,12 +277,14 @@ function get_videos_from_video_directory_by_course($course = null) {
                                     join {local_video_directory} vid on vid.id = catvid.video_id
                                     where cat.cat_name = ?
                                     ORDER BY vid.timemodified desc', [$course->shortname]);
+    //print_r($videos);die;
     foreach ($videos as $video) {
         // $video->source = $streamingurl . $video->filename . '.mp4';
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-            unset($videos[$video->id]);
-            continue;
+            //Tovi
+            //unset($videos[$video->id]);
+            //continue;
         }
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         $video->imgurl = $streamingurl . $video->filename . '-mini.png';

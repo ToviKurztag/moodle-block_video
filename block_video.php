@@ -89,9 +89,9 @@ class block_video extends block_base {
             'haszoomvideos' => count($zoomvideos) > 0 ? true : false,
             'showheader' => count($zoomvideos) > 0 || count($videos) > 0 ? true : false
         ];
-        if (!(count($zoomvideos) > 0 && !(count($videos)) || has_capability('block/video:addlocalvideos', $contextcourse)) ) {
-            return $this->content;
-        }
+        //if (!(count($zoomvideos) > 0 && !(count($videos)) || has_capability('block/video:addlocalvideos', $contextcourse)) ) {
+        //    return $this->content;
+        //}
         $this->content->text = $OUTPUT->render_from_template('block_video/blockvideo', $data);
         return $this->content;
     }

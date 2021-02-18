@@ -75,7 +75,7 @@ $event = \block_video\event\video_view::create(array(
 $event->trigger();
 
 $output = '';
-$output .= video($id, $courseid);
+$output .= block_video($id, $courseid);
 echo $OUTPUT->header();
 echo $OUTPUT->heading($videoname);
 echo $output;
