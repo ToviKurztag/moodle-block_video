@@ -66,6 +66,7 @@ $string['save'] = 'Save changes';
 $string['video:addlocalvideos'] = 'Add video from video directory';
 $string['video:addpublicbookmarks'] = 'Add public bookmark on video';
 $string['video:editnamevideo'] = 'Edit name of the video from zoom';
+$string['video:viewvideo'] = 'View video';
 $string['public'] = 'Public';
 $string['searchtexttitle'] = 'Text';
 $string['sortby'] = 'Sort by:';

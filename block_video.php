@@ -87,9 +87,9 @@ class block_video extends block_base {
             'zoomvideos' => $zoomvideos,
             'showzoomvideos' => count($zoomvideos) > 0 || has_capability('block/video:addlocalvideos', $contextcourse) ? true : false,
             'haszoomvideos' => count($zoomvideos) > 0 ? true : false,
-            'showheader' => count($zoomvideos) > 0 ? true : false
+            'showheader' => count($zoomvideos) > 0 || count($videos) > 0 ? true : false
         ];
-        if (!(count($zoomvideos) > 0 || has_capability('block/video:addlocalvideos', $contextcourse)) ) {
+        if (!(count($zoomvideos) > 0 && !(count($videos)) || has_capability('block/video:addlocalvideos', $contextcourse)) ) {
             return $this->content;
         }
         $this->content->text = $OUTPUT->render_from_template('block_video/blockvideo', $data);

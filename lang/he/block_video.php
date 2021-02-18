@@ -66,6 +66,8 @@ $string['save'] = 'שמירת שינויים';
 $string['video:addlocalvideos'] = 'הוספת וידיאו ממערכת הוידאו';
 $string['video:addpublicbookmarks'] = 'הוספת סימניות ציבוריות על הוידאו';
 $string['video:editnamevideo'] = 'עריכת שם הוידאו המגיע מזום';
+$string['video:viewvideo'] = 'צפייה בסרטון';
+
 $string['public'] = 'ציבורי';
 $string['searchtexttitle'] = 'טקסט';
 $string['sortby'] = 'סנן לפי:';
