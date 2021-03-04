@@ -144,6 +144,9 @@ input#searchtext {
 .hiddenfromstudents {
     color:gray !important;
 }
+.notdisplaytostudents {
+    display: none !important;
+}
 /*
 .colwidth {
 width: 30%;

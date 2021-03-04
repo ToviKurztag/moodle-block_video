@@ -1,5 +1,4 @@
-
-   {{#showheader}}
+{{#showheader}}
 <div id="videoheader">
     <div id="preference">
         {{#showheader}}  <input type="text" class="inputsearch" name="inputsearch" placeholder="{{#str}} search, block_video {{/str}}"/>
@@ -30,7 +29,7 @@
                     
                     <div class="bodytable">
                         {{#videos}}
-                            <div class="row  {{#hidden}}hiddenfromstudents{{/hidden}}" rowvid="{{{id}}}">
+                            <div class="row {{#hidden}}hiddenfromstudents {{^caneditnamevideo}}notdisplaytostudents{{/caneditnamevideo}} {{/hidden}}" rowvid="{{{id}}}">
                                 <div class="colvideo col-4">
                                     <a  class="imgurl" href="{{{source}}}">
                                         {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
@@ -110,7 +109,7 @@
                     <div class="videos">
                         <div id="arrowrightvideos" class="arrowright"><i class=" blockvideo_i fal fa-angle-double-{{#dirrtl}}left{{/dirrtl}}{{^dirrtl}}right{{/dirrtl}}"></i></div>
                         {{#videos}}
-                            <div id="{{{id}}}" class="videotableitem {{#hidden}} hiddenfromstudents {{/hidden}}" rowvid="{{{id}}}" dissearch="true">
+                            <div id="{{{id}}}" class="videotableitem {{#hidden}} hiddenfromstudents {{^caneditnamevideo}}notdisplaytostudents{{/caneditnamevideo}}{{/hidden}}" rowvid="{{{id}}}" dissearch="true">
                                 <a class="imgurl" href="{{{source}}}">
                                     {{#imgurl}}<img src="{{{imgurl}}}"/>{{/imgurl}}
                                     {{^imgurl}}<div class="bgimg"></div>{{/imgurl}}
