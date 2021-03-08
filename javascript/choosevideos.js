@@ -88,9 +88,6 @@ require(['jquery' , 'jqueryui', 'core/config'], function($, CFG) {
         console.log('click on save');
         data = [];
         $('.videoselected input').each(function() {
-            console.log($(this));
-            console.log(this.checked);
-            
             // data[this.name] = this.checked;
             obj = {};
             obj.id = this.name;

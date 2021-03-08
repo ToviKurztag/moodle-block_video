@@ -32,13 +32,25 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="block_video" COMMENT="Names of videos from bynat">
+    <TABLE NAME="block_video" COMMENT="properties of videos from zoom">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="true"  NEXT="videoid"/>
         <FIELD NAME="videoid" TYPE="char" LENGTH="128" NOTNULL="false" UNSIGNED="true" SEQUENCE="false"  PREVIOUS="ownerid" NEXT="name"/>
         <FIELD NAME="hidden" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" PREVIOUS="name" />
         <FIELD NAME="usermodifiedid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="name" NEXT="timemodified"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"  PREVIOUS="usermodifiedid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="block_video_course" COMMENT="course videos from videodirectory">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"  NEXT="videoid"/>
+        <FIELD NAME="videoid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" NEXT="courseid"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" NEXT="usermodifiedid"/>
+        <FIELD NAME="usermodifiedid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" NEXT="timemodified"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

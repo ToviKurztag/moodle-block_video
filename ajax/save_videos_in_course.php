@@ -36,28 +36,21 @@ $course = required_param('course', PARAM_RAW);
 $courseid = explode('-', $course)[1];
 $videos = json_decode($videos);
 
-$catvidcourse = $DB->get_field_sql('SELECT cat.id
-                                    from {local_video_directory_cats} cat
-                                    join {course} c on cat.cat_name = c.shortname
-                                    where c.id = ?', [$courseid]);
-if (!isset($catvidcourse) || empty($catvidcourse)) {
-    $shortname = $DB->get_field('course', 'shortname', ['id' => $courseid]);
-    $cat = new stdClass();
-    $cat->father_id = 0;
-    $cat->cat_name = $shortname;
-    $catvidcourse = $DB->insert_record('local_video_directory_cats', $cat);
-}
-
+//print_r($videos);die;
 foreach ($videos as $vid) {
-    if ($vidcat = $DB->get_record('local_video_directory_catvid', ['cat_id' => $catvidcourse, 'video_id' => $vid->id])) {
+    $video = $DB->get_record('block_video_course', ['courseid' => $courseid, 'videoid' => $vid->id]);
+
+    if (isset($video) && !empty($video)) {
         if ($vid->checked == false) {
-            $DB->delete_records('local_video_directory_catvid', ['cat_id' => $catvidcourse, 'video_id' => $vid->id]);
+            $DB->delete_records('block_video_course', ['courseid' => $courseid, 'videoid' => $vid->id]);
         }
     } else if ($vid->checked == true) {
-        $vidcat = new stdClass();
-        $vidcat->cat_id = $catvidcourse;
-        $vidcat->video_id = $vid->id;
-        $DB->insert_record('local_video_directory_catvid', $vidcat);
+        $v = new stdClass();
+        $v->videoid = $vid->id;
+        $v->courseid = $courseid;
+        $v->usermodifiedid = $USER->id;
+        $v->timemodified = time();
+        $DB->insert_record('block_video_course', $v);
     }
 }
 print_r($CFG->wwwroot . '/course/view.php?id=' . $courseid);

@@ -53,8 +53,6 @@ $PAGE->set_course($course);
 //    redirect($CFG->wwwroot . '/course/view.php?id=' . $courseid);
 //}
 
-
-
 $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/blocks/video/javascript/choosevideos.js'));
 echo $OUTPUT->header();
 $fields = ['selected', 'thumb', 'id', 'name', 'length', 'owner', 'public', 'timecreated'];
@@ -72,7 +70,4 @@ $datafortemplate = [
 ];
 
 echo $OUTPUT->render_from_template('block_video/choosevideos', $datafortemplate);
-
-
-
 echo $OUTPUT->footer();

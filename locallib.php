@@ -198,16 +198,7 @@ function get_videos_from_zoom($courseid = null) {
     }
     $result = [];
     $streamingurl = get_config('local_video_directory', 'streaming');
-    /*
-    $role = get_user_roles_in_course($USER->id, $courseid);
-    $pos = strpos($role, get_string("student", "block_video"));
-  
-    if (isset($pos) & !empty($pos)) { 
-	    $hidden = " AND bv.hidden != 1";
-    } else {
-        $hidden = "";
-    }*/
-
+   
     $sql = "SELECT DISTINCT vv.id, vv.orig_filename as name,
     vv.filename,vv.timemodified, thumb, vv.length, bv.hidden
                         FROM  {local_video_directory} vv
@@ -225,7 +216,6 @@ function get_videos_from_zoom($courseid = null) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
           //Tovi
-            //  print_r($video->filename);die;
            // unset($videos[$video->id]);
             //continue;
         }
@@ -270,15 +260,14 @@ function get_videos_from_video_directory_by_course($course = null) {
     }
     $result = [];
     $streamingurl = get_config('local_video_directory', 'streaming');
-    $videos = $DB->get_records_sql('SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, cat.cat_name
-                                    from {local_video_directory_cats} cat
-                                    join {local_video_directory_catvid} catvid on cat.id = catvid.cat_id
-                                    join {local_video_directory} vid on vid.id = catvid.video_id
-                                    where cat.cat_name = ?
-                                    ORDER BY vid.timemodified desc', [$course->shortname]);
-    //print_r($videos);die;
+    
+    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vc.courseid
+        from mdl_block_video_course vc
+        join mdl_local_video_directory vid on vid.id = vc.videoid
+        where vc.courseid = ?
+        ORDER BY vid.timemodified desc';
+    $videos = $DB->get_records_sql($sql,  [$course->id]);
     foreach ($videos as $video) {
-        // $video->source = $streamingurl . $video->filename . '.mp4';
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
             //Tovi
@@ -321,18 +310,18 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
         }
     }
     $streamingurl = get_config('local_video_directory', 'streaming');
-    $catvidcourse = $DB->get_field('local_video_directory_cats', 'id', ['cat_name' => $course->shortname]);
-    $catvidcourse = isset($catvidcourse) && !empty($catvidcourse) ? $catvidcourse : 0;
-    $videos = $DB->get_records_sql('SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, catvid.cat_id
-                                            ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) ownername
-                                    from {local_video_directory} vid
-                                    left join {local_video_directory_catvid} catvid on vid.id = catvid.video_id and catvid.cat_id = ?
-                                    left join {user} u on vid.owner_id = u.id
-                                    where (vid.owner_id = ? or private = 0 or catvid.cat_id = ?)
-                                    ORDER BY name', [$catvidcourse, $userid, $catvidcourse]);
-    
+   
+    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vc.courseid
+            ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) as ownername
+            from mdl_local_video_directory vid
+            left join mdl_block_video_course vc on vid.id = vc.videoid
+            left join mdl_user u on vid.owner_id = u.id
+            where (vid.owner_id = ? or private = 0) OR  vc.courseid = ?
+            ORDER BY name';
+    $videos = $DB->get_records_sql($sql, [$userid, $course->id]);
+
     foreach ($videos as $video) {
-        $video->select = $video->cat_id == $catvidcourse ? true : false;
+        $video->select = $video->courseid == $course->id ? true : false;
         $video->source = $streamingurl . $video->filename . '.mp4';
         if ( ! check_file_exist($video->source)) {
              unset($videos[$video->id]);
