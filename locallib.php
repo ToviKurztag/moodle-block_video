@@ -59,7 +59,7 @@ function block_video_get_video_videojs($type, $id, $courseid) {
     $videolink = block_video_createsymlink($id);
 
     $data = array('width' => $width, 'height' => $height, 'videostream' => $videolink, 'wwwroot' => $CFG->wwwroot, 'videoid' => $id, 'type' => 'video/mp4');
-    $output = $OUTPUT->render_from_template("block_videodirectory/hls", $data);
+    $output = $OUTPUT->render_from_template("block_video/hls", $data);
     $output .= block_video_events($id, $courseid);
     return $output;
 }
@@ -170,7 +170,7 @@ function block_video_get_video_hls($id, $courseid) {
     $height = '500px';
     $hlsstream = block_video_createHLS($id);
     $data = array('width' => $width, 'height' => $height, 'videostream' => $hlsstream, 'wwwroot' => $CFG->wwwroot, 'videoid' => $id, 'type' => 'application/x-mpegURL');
-    $output = $OUTPUT->render_from_template("block_videodirectory/hls", $data);
+    $output = $OUTPUT->render_from_template("block_video/hls", $data);
     $output .= block_video_events($id, $courseid);
     return $output;
 }
@@ -198,14 +198,15 @@ function get_videos_from_zoom($courseid = null) {
     }
     $result = [];
     $streamingurl = get_config('local_video_directory', 'streaming');
-
+    /*
     $role = get_user_roles_in_course($USER->id, $courseid);
     $pos = strpos($role, get_string("student", "block_video"));
-    if (isset($pos) & !empty($pos)) {
-        $hidden = " AND bv.hidden != 1";
+  
+    if (isset($pos) & !empty($pos)) { 
+	    $hidden = " AND bv.hidden != 1";
     } else {
         $hidden = "";
-    }
+    }*/
 
     $sql = "SELECT DISTINCT vv.id, vv.orig_filename as name,
     vv.filename,vv.timemodified, thumb, vv.length, bv.hidden
@@ -215,11 +216,10 @@ function get_videos_from_zoom($courseid = null) {
                         LEFT JOIN {zoom} z
                         ON z.meeting_id = vz.zoom_meeting_id
                         LEFT JOIN {block_video} as bv
-                        ON vv.id = bv.videoid
-                        WHERE z.course = ?" . $hidden;
+                        ON vv.id = bv.videoid WHERE z.course = ?";
 
                         
-        $videos = $DB->get_records_sql($sql, [$course->id]);
+    $videos = $DB->get_records_sql($sql, [$course->id]);
 
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
@@ -236,8 +236,7 @@ function get_videos_from_zoom($courseid = null) {
         }
         $video->date = date('d-m-yy H:i:s', $video->timemodified);
 
-    }
-   // print_r($videos);die;
+    }  
 
     return array_values($videos);
 }
