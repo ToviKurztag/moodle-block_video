@@ -200,7 +200,7 @@ function get_videos_from_zoom($courseid = null) {
     $streamingurl = get_config('local_video_directory', 'streaming');
    
     $sql = "SELECT DISTINCT vv.id, vv.orig_filename as name,
-    vv.filename,vv.timemodified, thumb, vv.length, bv.hidden
+    vv.filename,vv.timemodified, vv.timecreated, thumb, vv.length, bv.hidden
                         FROM  {local_video_directory} vv
                         LEFT JOIN {local_video_directory_zoom} vz
                         ON vv.id = vz.video_id
@@ -224,7 +224,7 @@ function get_videos_from_zoom($courseid = null) {
         if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
             $video->imgurl = '';
         }
-        $video->date = date('d-m-yy H:i:s', $video->timemodified);
+        $video->date = date('d-m-Y H:i:s', $video->timecreated);
 
     }  
 
@@ -261,7 +261,7 @@ function get_videos_from_video_directory_by_course($course = null) {
     $result = [];
     $streamingurl = get_config('local_video_directory', 'streaming');
     
-    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vc.courseid
+    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
         from mdl_block_video_course vc
         join mdl_local_video_directory vid on vid.id = vc.videoid
         where vc.courseid = ?
@@ -279,7 +279,7 @@ function get_videos_from_video_directory_by_course($course = null) {
         if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
             $video->imgurl = '';
         }
-        $video->date = date('d-m-yy H:i:s', $video->timemodified);
+        $video->date = date('d-m-Y H:i:s', $video->timecreated);
     }
     return array_values($videos);
 }
@@ -311,7 +311,7 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
     }
     $streamingurl = get_config('local_video_directory', 'streaming');
    
-    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vc.courseid
+    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
             ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) as ownername
             from mdl_local_video_directory vid
             left join mdl_block_video_course vc on vid.id = vc.videoid
@@ -334,8 +334,8 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
         }
         $video->canedit = $video->owner_id == $USER->id || $video->private == 0 || $isadmin ? true : false;
         $video->public = $video->private == 0 ? get_string('yes') : get_string('no');
-        $video->date = date('d-m-yy H:i:s', $video->timemodified);
-        $video->dateday = date('m-d-yy', $video->timemodified);
+        $video->date = date('d-m-Y H:i:s', $video->timecreated);
+        $video->dateday = date('m-d-Y', $video->timecreated);
     }
     return $videos;
 }
