@@ -215,14 +215,13 @@ function get_videos_from_zoom($courseid = null) {
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-          //Tovi
-           // unset($videos[$video->id]);
-            //continue;
+            unset($videos[$video->id]);
+            continue;
         }
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         $video->imgurl = $streamingurl . $video->filename . '-mini.png';
         if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
-            $video->imgurl = '';
+                $video->imgurl = '';
         }
         $video->date = date('d-m-Y H:i:s', $video->timecreated);
 
@@ -270,9 +269,8 @@ function get_videos_from_video_directory_by_course($course = null) {
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-            //Tovi
-            //unset($videos[$video->id]);
-            //continue;
+            unset($videos[$video->id]);
+            continue;
         }
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         $video->imgurl = $streamingurl . $video->filename . '-mini.png';
@@ -319,13 +317,12 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
             where (vid.owner_id = ? or private = 0) OR  vc.courseid = ?
             ORDER BY name';
     $videos = $DB->get_records_sql($sql, [$userid, $course->id]);
-
     foreach ($videos as $video) {
         $video->select = $video->courseid == $course->id ? true : false;
         $video->source = $streamingurl . $video->filename . '.mp4';
-        if ( ! check_file_exist($video->source)) {
-             unset($videos[$video->id]);
-             continue;
+        if ( ! check_file_exist($video->source)) { 
+            unset($videos[$video->id]);
+            continue;
         }
         //$video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
