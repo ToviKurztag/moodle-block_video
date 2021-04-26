@@ -1,0 +1,16 @@
+<html>
+<head>
+</head>
+<body>
+  <div data-vimeo-id="{{video_vimeoid}}" data-vimeo-width="{{width}}" id="{{video_vimeoid}}"></div>
+
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    var video01Player = new Vimeo.Player('{{video_vimeoid}}');
+    video01Player.on('play', function() {
+      console.log('Played the first video');
+    });
+  </script>
+
+</body>
+</html>

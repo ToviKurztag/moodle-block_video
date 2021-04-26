@@ -41,12 +41,48 @@ function block_video($id , $courseid) {
     } else if ($config->streaming == "hls") {
         // Elements for video sources. (here we get the hls video).
         $output .= block_video_get_video_hls($id, $courseid);
+    } else if($config->streaming == "vimeo") {
+        $output .= block_video_get_video_vimeo($id, $courseid);
     }
     $output .= block_video_get_bookmark_controls($id);
-    // Close video tag.
     $output .= html_writer::end_tag('video');
-    // Close videostream div.
     $output .= "</div>";
+    return $output;
+}
+
+
+function get_video_source_elements_vimeo($videostream) {
+    global $CFG, $OUTPUT, $DB;
+
+   
+    $video = $DB->get_record('local_video_directory', ['id' => $videostream->get_instance()->videoid]);
+    $videovimeo = $DB->get_record('local_video_directory_vimeo', ['videoid' => $videostream->get_instance()->videoid]);
+
+    $data = array('width' => $width, 'height' => $height, 'symlinkstream' => $videovimeo->streamingurl, 'type' => 'video/mp4',
+                  'wwwroot' => $CFG->wwwroot, 'video_id' => $video->id, 'video_vimeoid' => $videovimeo->vimeoid);
+
+    $output = $OUTPUT->render_from_template("mod_videostream/vimeo", $data);
+
+    $output .= $this->video_events($videostream, 1);
+    return $output;
+}
+
+
+
+
+function block_video_get_video_vimeo($id, $courseid) {
+    global $CFG, $OUTPUT, $DB;
+
+    $width = '800px';
+    $height = '500px';
+
+    $videovimeo = $DB->get_record('local_video_directory_vimeo', ['videoid' => $id]);
+
+    $data = array('width' => $width, 'height' => $height, 'symlinkstream' => $videovimeo->streamingurl, 'type' => 'video/mp4',
+    'wwwroot' => $CFG->wwwroot, 'video_id' => $id, 'video_vimeoid' => $videovimeo->vimeoid);
+
+    $output = $OUTPUT->render_from_template("block_video/vimeo", $data);
+    $output .= block_video_events($id, $courseid);
     return $output;
 }
 
@@ -94,7 +130,6 @@ function block_video_createHLS($videoid) {
     $hls_url .= "," . ".mp4".$config->nginx_multi."/master.m3u8";
     return $hls_url;
 }
-
 
 
 function block_video_events($id, $courseid) {
@@ -156,11 +191,13 @@ function block_video_get_bookmark_controls($videoid) {
 
     $bookmarks = array_values(array_map(function($a) {
         $a->bookmarkpositionvisible = gmdate("H:i:s", (int)$a->videoposition);
+        $a->permission = $a->permission == 'public'? 1: 0;
         return $a;
     }, $bookmarks));
+    //print_r($bookmarks);die;
     $submit = get_string('submitbookmark' , 'block_video' );
     $output .= $OUTPUT->render_from_template('block_video/bookmark_controls',
-    ['bookmarks' => $bookmarks, 'video_id' => $videoid, 'isteacher' => $isteacher, 'submit' => $submit]);
+    ['bookmarks' => $bookmarks, 'video_id' => $videoid, 'isteacher' => $isteacher, 'submit' => $submit, 'userid' => $USER->id]);
     return $output;
 }
 
@@ -191,13 +228,14 @@ function block_video_createsymlink($videoid) {
 
 function get_videos_from_zoom($courseid = null) {
     global $COURSE, $DB, $USER, $CFG;
+    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
 
     $course = $DB->get_record("course", ["id"=> $courseid]);
     if ($course == null) {
         $course = $COURSE;
     }
     $result = [];
-    $streamingurl = get_config('local_video_directory', 'streaming');
+    $streamingurl = get_config('local_video_directory', 'streaming') . '/';
    
     $sql = "SELECT DISTINCT vv.id, vv.orig_filename as name,
     vv.filename,vv.timemodified, vv.timecreated, thumb, vv.length, bv.hidden
@@ -214,14 +252,24 @@ function get_videos_from_zoom($courseid = null) {
 
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
-        if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-            unset($videos[$video->id]);
-            continue;
+        if (get_config('local_video_directory_cloud', 'cloudtype') == 'Vimeo') {
+            if(!isset(get_data_vimeo($video->id)->streamingurl)) {
+                unset($videos[$video->id]);
+            }
+        } else {
+            if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
+                unset($videos[$video->id]);
+                continue;
+            }
         }
-        $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
-        $video->imgurl = $streamingurl . $video->filename . '-mini.png';
-        if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
+        
+        if (get_config('local_video_directory_cloud', 'cloudtype') == 'Vimeo') {
+            $video->imgurl =  get_data_vimeo($video->id)->thumburl;
+            if (!isset($video->imgurl)) {
                 $video->imgurl = '';
+            }
+        } else {
+            $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         }
         $video->date = date('d-m-Y H:i:s', $video->timecreated);
 
@@ -253,12 +301,12 @@ function get_showingprefernece_of_user($userid = null) {
 
 function get_videos_from_video_directory_by_course($course = null) {
     global $COURSE, $DB, $USER, $CFG;
-
+    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
     if ($course == null) {
         $course = $COURSE;
     }
     $result = [];
-    $streamingurl = get_config('local_video_directory', 'streaming');
+    $streamingurl = get_config('local_video_directory', 'streaming') . '/';
     
     $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
         from mdl_block_video_course vc
@@ -268,15 +316,18 @@ function get_videos_from_video_directory_by_course($course = null) {
     $videos = $DB->get_records_sql($sql,  [$course->id]);
     foreach ($videos as $video) {
         $video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
-        if ( ! check_file_exist($streamingurl . $video->filename . '.mp4')) {
-            unset($videos[$video->id]);
-            continue;
+        
+        if (get_config('local_video_directory_cloud', 'cloudtype') == 'Vimeo') {
+            if(!isset(get_data_vimeo($video->id)->streamingurl)) {
+                unset($videos[$video->id]);
+            }
+        } else {
+            if ( !check_file_exist($streamingurl . $video->filename . '.mp4')) {
+                unset($videos[$video->id]);
+                continue;
+            }
         }
-        $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
-        $video->imgurl = $streamingurl . $video->filename . '-mini.png';
-        if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
-            $video->imgurl = '';
-        }
+        $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';     
         $video->date = date('d-m-Y H:i:s', $video->timecreated);
     }
     return array_values($videos);
@@ -293,6 +344,8 @@ function get_videos_from_video_directory_by_course($course = null) {
 function get_videos_from_video_directory_by_owner($course = null, $userid = null, $public = false) {
 
     global $DB, $USER, $COURSE, $CFG;
+    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
+
     if ($userid == null) {
         $userid = $USER->id;
     }
@@ -307,7 +360,7 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
             break;
         }
     }
-    $streamingurl = get_config('local_video_directory', 'streaming');
+    $streamingurl = get_config('local_video_directory', 'streaming') . '/';
    
     $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
             ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) as ownername
@@ -320,15 +373,18 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
     foreach ($videos as $video) {
         $video->select = $video->courseid == $course->id ? true : false;
         $video->source = $streamingurl . $video->filename . '.mp4';
-        if ( ! check_file_exist($video->source)) { 
-            unset($videos[$video->id]);
-            continue;
+
+        if (get_config('local_video_directory_cloud', 'cloudtype') == 'Vimeo') {
+            if(!isset(get_data_vimeo($video->id)->streamingurl)) {
+                unset($videos[$video->id]);
+            }
+        } else {
+            if ( !check_file_exist($video->source)) { 
+                    unset($videos[$video->id]);
+                    continue;
+            }
         }
-        //$video->source = $CFG->wwwroot . '/blocks/video/viewvideo.php?id=' . $video->id . '&courseid=' . $course->id . '&type=2';
         $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
-        if (! check_file_exist($streamingurl . $video->filename . '-mini.png')) {
-            $video->imgurl = '';
-        }
         $video->canedit = $video->owner_id == $USER->id || $video->private == 0 || $isadmin ? true : false;
         $video->public = $video->private == 0 ? get_string('yes') : get_string('no');
         $video->date = date('d-m-Y H:i:s', $video->timecreated);

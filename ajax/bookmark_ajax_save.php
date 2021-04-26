@@ -10,11 +10,10 @@ if (!isloggedin() || isguestuser()) {
 
 if ($id = optional_param('delete', null, PARAM_INT)) {
     // $DB->delete_records('videostreambookmarks', ['id' => $id, 'userid' => $USER->id]);.
-    $DB->delete_records('local_video_bookmarks', ['id' => $id]);
+    $DB->delete_records('block_video_bookmarks', ['id' => $id]);
     die('1');
 }
 $videotype = required_param('videotype', PARAM_INT);
-// echo $videotype; die;
 $video_id = required_param('video_id', PARAM_RAW);
 $videoposition = required_param('bookmarkposition', PARAM_FLOAT);
 $text = required_param('bookmarkname', PARAM_RAW);

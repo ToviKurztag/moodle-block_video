@@ -22,17 +22,27 @@
 </div>
 {{#js}}
 require(['jquery', 'core/templates'], function($, templates) {
-	//var video = $('#video_html5_api')[0];
+	var video_vimeoid;
 	var video = $('#myPlayer_html5_api')[0];
-	if (!video) {
-         var video = $('#video-{{video_id}}')[0];
-	}
-    
+        if (video == 'undefined' || !video) {
+			var video = $('#video-{{video_id}}')[0];
+		}
+        if (video == 'undefined' || !video) {
+			video_vimeoid = $('iframe').first().parent().attr("id");
+            if (typeof video_vimeoid !== "undefined") {
+                var video = new Vimeo.Player(video_vimeoid);
+            } else {
+                video_vimeoid = $('iframe').first().parent().parent().attr("id");
+                var video = new Vimeo.Player(video_vimeoid);
+            }
+		}
+
 	$('#bookmarkflagtoggle-{{uniqid}}').click(function(e) {
 		e.preventDefault();
 		var currentval = $(this).next().val();
 		$(this).toggleClass('flagged').next().val(1 - currentval);
 	});
+	
 	$('#bookmarksave-{{uniqid}}').click(function(e) {
 		e.preventDefault();
 		
@@ -40,11 +50,26 @@ require(['jquery', 'core/templates'], function($, templates) {
 			return;
 		}
 		
-        var currenttime = video.currentTime;
 		var theform = $('#bookmarkform-{{uniqid}}');
-		theform[0][0].value = currenttime;
+        //var currenttime = video.currentTime;
+		//theform[0][0].value = currenttime;
+
+		if (typeof video_vimeoid !== "undefined" || video_vimeoid) {
+            video.getCurrentTime().then(function(data) {
+            var currenttime = data;
+			theform[0][0].value = currenttime;
+            $('#bookmark-position-{{uniqid}}').val(currenttime);
+            $('#bookmark-position-visible-{{uniqid}}').val(s_to_hms(currenttime));
+                });
+        } else {
+            var currenttime = video.currentTime;
+			theform[0][0].value = currenttime;
+            $('#bookmark-position-{{uniqid}}').val(currenttime);
+            $('#bookmark-position-visible-{{uniqid}}').val(s_to_hms(currenttime));
+        }
+
+
 		var checkBox = $('#teacherbookmark');
-		console.log(checkBox);
 		if (checkBox.is(':checked')) {
 			  $("#teacherbookmark").val("1");
 		}
@@ -65,7 +90,12 @@ require(['jquery', 'core/templates'], function($, templates) {
 	});
 	
 	$('#videobookmarklist').on('click', 'a', function(e) {
-		video.currentTime = $(this).data('position');
+		//video.currentTime = $(this).data('position');
+		 if (typeof video_vimeoid !== "undefined" || video_vimeoid) {
+            	video.setCurrentTime($(this).data('position'));
+            } else {
+                video.currentTime = $(this).data('position');
+            }
 	});
 	
 	$('#videobookmarklist').on('click', '.deletebookmark', function(e) {

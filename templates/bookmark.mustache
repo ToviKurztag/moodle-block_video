@@ -3,12 +3,12 @@
 		<span class="deletebookmark" data-id="{{id}}">&times;</span>	
 {{/isteacher}}
 {{^isteacher}}
-	{{#teacherid}} 	
+	{{#permission}} 	
 		<span style="visibility: hidden" class="deletebookmark" data-id="{{id}}">&times;</span> 
-	{{/teacherid}}
-	{{^teacherid}} 
+	{{/permission}}
+	{{^permission}} 
 		<span class="deletebookmark" data-id="{{id}}">&times;</span> 
-	{{/teacherid}}
+	{{/permission}}
 {{/isteacher}}
 	<a href="#t={{videoposition}}" data-position="{{videoposition}}">{{bookmarkpositionvisible}}, {{text}} </a>
 </div>
