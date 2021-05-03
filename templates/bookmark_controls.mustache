@@ -5,7 +5,7 @@
 		<label>{{#str}}bookmarkname, block_video{{/str}}:</label>
 		<input name="bookmarkname" class="form-control" id="bookmarkname-{{uniqid}}">
 		<input name="videotype" type="hidden" value="{{videotype}}">
-        <input name="video_id" type="hidden" value="{{video_id}}">
+                <input name="id" type="hidden" value="{{video_id}}">
 		<input type="submit" class="btn btn-primary" id="bookmarksave-{{uniqid}}" value="{{submit}}" >
 		{{#isteacher}}
  			<br><input type="checkbox" id="teacherbookmark" name="teacherbookmark" value = "0">
@@ -24,18 +24,15 @@
 require(['jquery', 'core/templates'], function($, templates) {
 	var video_vimeoid;
 	var video = $('#myPlayer_html5_api')[0];
-        if (video == 'undefined' || !video) {
-			var video = $('#video-{{video_id}}')[0];
-		}
-        if (video == 'undefined' || !video) {
-			video_vimeoid = $('iframe').first().parent().attr("id");
-            if (typeof video_vimeoid !== "undefined") {
-                var video = new Vimeo.Player(video_vimeoid);
-            } else {
-                video_vimeoid = $('iframe').first().parent().parent().attr("id");
-                var video = new Vimeo.Player(video_vimeoid);
-            }
-		}
+    if (video == 'undefined' || !video) {
+		var video = $('#video-{{video_id}}')[0];
+	}
+    if (video == 'undefined' || !video) {
+	video_vimeoid = $("[videoid={{video_id}}]").attr("id");
+        if (typeof video_vimeoid !== "undefined") {
+            var video = new Vimeo.Player(video_vimeoid);
+        } 
+	}
 
 	$('#bookmarkflagtoggle-{{uniqid}}').click(function(e) {
 		e.preventDefault();
@@ -73,6 +70,8 @@ require(['jquery', 'core/templates'], function($, templates) {
 		if (checkBox.is(':checked')) {
 			  $("#teacherbookmark").val("1");
 		}
+		console.log(theform);
+		//alert('hii');
 		$.post(M.cfg.wwwroot + '/blocks/video/ajax/bookmark_ajax_save.php', theform.serialize(), function(data) {
 			var context = data;
 			theform[0].reset();

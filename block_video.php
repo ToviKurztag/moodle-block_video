@@ -55,7 +55,7 @@ class block_video extends block_base {
         require_once(__DIR__ . '/locallib.php');
         $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/blocks/video/javascript/javascript.js'));
 
-
+        $hiddenzoomvideos = get_config('block_video', 'hiddenzoomvideos');
         $videos = get_videos_from_zoom($COURSE->id);
         $videos = array_map(function($v)
         {
@@ -65,7 +65,7 @@ class block_video extends block_base {
                 $v = (object)$obj;
             } else {
                 $obj = (array)$v;
-                $obj['hiddenclass'] = 'fa-eye';
+                $obj['hiddenclass'] = $hiddenzoomvideos? 'fa-eye-slash' :'fa-eye';
                 $v = (object)$obj;
             }
             return $v;

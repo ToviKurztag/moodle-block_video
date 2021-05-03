@@ -49,4 +49,9 @@ if ($ADMIN->fulltree) {
         get_string('addpublicbookmarks', 'block_video'),
         get_string('addpublicbookmarks_help', 'block_video'), 1)
     );
+    $settings->add(new admin_setting_configcheckbox(
+        'block_video/hiddenzoomvideos',
+        get_string('hiddenzoomvideos', 'block_video'),
+        get_string('hiddenzoomvideos_help', 'block_video'), 0)
+    );
 }

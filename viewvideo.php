@@ -33,7 +33,7 @@ require_once(dirname(__FILE__) . '/locallib.php');
 // global $PAGE;
 
 $id = required_param('id', PARAM_RAW);
-$courseid = required_param('courseid', PARAM_INT);
+$courseid = optional_param('courseid', 1 , PARAM_INT);
 
 // Block page for non auth users
 require_login($courseid);

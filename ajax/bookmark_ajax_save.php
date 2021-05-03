@@ -14,7 +14,7 @@ if ($id = optional_param('delete', null, PARAM_INT)) {
     die('1');
 }
 $videotype = required_param('videotype', PARAM_INT);
-$video_id = required_param('video_id', PARAM_RAW);
+$video_id = required_param('id', PARAM_RAW);
 $videoposition = required_param('bookmarkposition', PARAM_FLOAT);
 $text = required_param('bookmarkname', PARAM_RAW);
 // $bookmarkflag = required_param('bookmarkflag', PARAM_RAW);

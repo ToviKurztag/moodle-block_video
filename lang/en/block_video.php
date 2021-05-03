@@ -76,4 +76,5 @@ $string['viewvideo'] = 'view videos';
 $string['submitbookmark'] = 'Submit bookmark';
 $string['student'] = 'Student';
 $string['hiddenfromstudents'] = 'hidden from students';
-
+$string['hiddenzoomvideos'] = 'hidden zoom videos from students';
+$string['hiddenzoomvideos_help'] = 'by defult hidden zoom videos from students';

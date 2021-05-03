@@ -37,8 +37,7 @@ function block_video($id , $courseid) {
 
     if (($config->streaming == "symlink") || ($config->streaming == "php")) {
         $output .= block_video_get_video_videojs($config->streaming, $id, $courseid);
-
-    } else if ($config->streaming == "hls") {
+    } else if ($config->streaming == "hls" || ($config->streaming == "vimeo" && !$config->vimeoplayer)) {
         // Elements for video sources. (here we get the hls video).
         $output .= block_video_get_video_hls($id, $courseid);
     } else if($config->streaming == "vimeo") {
@@ -67,9 +66,6 @@ function get_video_source_elements_vimeo($videostream) {
     return $output;
 }
 
-
-
-
 function block_video_get_video_vimeo($id, $courseid) {
     global $CFG, $OUTPUT, $DB;
 
@@ -82,7 +78,7 @@ function block_video_get_video_vimeo($id, $courseid) {
     'wwwroot' => $CFG->wwwroot, 'video_id' => $id, 'video_vimeoid' => $videovimeo->vimeoid);
 
     $output = $OUTPUT->render_from_template("block_video/vimeo", $data);
-    $output .= block_video_events($id, $courseid);
+    //$output .= block_video_events($id, $courseid);
     return $output;
 }
 
@@ -202,17 +198,23 @@ function block_video_get_bookmark_controls($videoid) {
 }
 
 function block_video_get_video_hls($id, $courseid) {
-    global $CFG, $OUTPUT, $PAGE;
+    global $CFG, $OUTPUT, $PAGE, $DB;
     $width = '800px';
     $height = '500px';
-    $hlsstream = block_video_createHLS($id);
+    $config = get_config('videostream');
+
+    if ($config->streaming == "vimeo") {
+        $hlsstream = $DB->get_field_sql("SELECT streaminghls FROM {local_video_directory_vimeo} WHERE videoid = ? limit 1",
+        ['videoid' => $id]);
+    } else {
+        $hlsstream = block_video_createHLS($id);
+    }
+    
     $data = array('width' => $width, 'height' => $height, 'videostream' => $hlsstream, 'wwwroot' => $CFG->wwwroot, 'videoid' => $id, 'type' => 'application/x-mpegURL');
     $output = $OUTPUT->render_from_template("block_video/hls", $data);
     $output .= block_video_events($id, $courseid);
     return $output;
 }
-
-
 
 function block_video_createsymlink($videoid) {
     global $DB;
@@ -223,8 +225,6 @@ function block_video_createsymlink($videoid) {
     $config = get_config('local_video_directory');
     return $config->streaming . "/" . $filename;
 }
-
-
 
 function get_videos_from_zoom($courseid = null) {
     global $COURSE, $DB, $USER, $CFG;
@@ -247,7 +247,6 @@ function get_videos_from_zoom($courseid = null) {
                         LEFT JOIN {block_video} as bv
                         ON vv.id = bv.videoid WHERE z.course = ?";
 
-                        
     $videos = $DB->get_records_sql($sql, [$course->id]);
 
     foreach ($videos as $video) {
@@ -272,7 +271,6 @@ function get_videos_from_zoom($courseid = null) {
             $video->imgurl = $CFG->wwwroot . '/local/video_directory/thumb.php?id=' . $video->id . '&mini=1';
         }
         $video->date = date('d-m-Y H:i:s', $video->timecreated);
-
     }  
 
     return array_values($videos);

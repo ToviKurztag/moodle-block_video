@@ -77,3 +77,5 @@ $string['viewvideo'] = 'צפיה בסרטונים';
 $string['submitbookmark'] = 'שמירת סימניה';
 $string['student'] = 'סטודנט';
 $string['hiddenfromstudents'] = 'מוסתר מסטודנטים';
+$string['hiddenzoomvideos'] = 'הסתרת סרטי זום מהסטודנטים';
+$string['hiddenzoomvideos_help'] = 'כברירת מחדל הסתר סרטי זום מהסטודנטים';
