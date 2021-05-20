@@ -228,8 +228,11 @@ function block_video_createsymlink($videoid) {
 
 function get_videos_from_zoom($courseid = null) {
     global $COURSE, $DB, $USER, $CFG;
-    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
 
+    $filename = $CFG->dirroot . '/local/video_directory/cloud/locallib.php';
+    if (file_exists($filename)) {
+        require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
+    }
     $course = $DB->get_record("course", ["id"=> $courseid]);
     if ($course == null) {
         $course = $COURSE;
@@ -299,8 +302,11 @@ function get_showingprefernece_of_user($userid = null) {
 
 function get_videos_from_video_directory_by_course($course = null) {
     global $COURSE, $DB, $USER, $CFG;
-    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
-    if ($course == null) {
+    
+    $filename = $CFG->dirroot . '/local/video_directory/cloud/locallib.php';
+    if (file_exists($filename)) {
+        require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
+    }    if ($course == null) {
         $course = $COURSE;
     }
     $result = [];
@@ -342,8 +348,11 @@ function get_videos_from_video_directory_by_course($course = null) {
 function get_videos_from_video_directory_by_owner($course = null, $userid = null, $public = false) {
 
     global $DB, $USER, $COURSE, $CFG;
-    require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
-
+   
+    $filename = $CFG->dirroot . '/local/video_directory/cloud/locallib.php';
+    if (file_exists($filename)) {
+        require_once($CFG->dirroot . '/local/video_directory/cloud/locallib.php');
+    }
     if ($userid == null) {
         $userid = $USER->id;
     }
