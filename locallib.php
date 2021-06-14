@@ -368,15 +368,34 @@ function get_videos_from_video_directory_by_owner($course = null, $userid = null
         }
     }
     $streamingurl = get_config('local_video_directory', 'streaming') . '/';
-   
-    $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
+
+    if ($isadmin) {
+        $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
             ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) as ownername
             from mdl_local_video_directory vid
-            left join mdl_block_video_course vc on vid.id = vc.videoid
+            left join mdl_block_video_course vc on vid.id = vc.videoid and vc.courseid = ?
             left join mdl_user u on vid.owner_id = u.id
-            where (vid.owner_id = ? or private = 0) OR  vc.courseid = ?
+            where (vid.owner_id in  
+                (SELECT userid
+                FROM mdl_role_assignments as a
+                join mdl_context as c 
+                on a.contextid = c.id
+                where a.roleid = 3 and c.contextlevel = 50 and c.instanceid = ?
+                ) 
+            or private = 0) OR  vc.courseid = ?
             ORDER BY name';
-    $videos = $DB->get_records_sql($sql, [$userid, $course->id]);
+            $videos = $DB->get_records_sql($sql, [$course->id, $course->id, $course->id]);
+    } else {
+        $sql = 'SELECT vid.id, vid.orig_filename name, vid.filename, length, vid.timemodified, vid.timecreated, vc.courseid
+                ,vid.private, vid.owner_id, concat(u.firstname, " ", u.lastname) as ownername
+                from mdl_local_video_directory vid
+                left join mdl_block_video_course vc on vid.id = vc.videoid and vc.courseid = ?
+                left join mdl_user u on vid.owner_id = u.id
+                where (vid.owner_id = ? or private = 0) OR  vc.courseid = ?
+                ORDER BY name';
+        
+        $videos = $DB->get_records_sql($sql, [ $course->id, $userid, $course->id]);
+    }
     foreach ($videos as $video) {
         $video->select = $video->courseid == $course->id ? true : false;
         $video->source = $streamingurl . $video->filename . '.mp4';
